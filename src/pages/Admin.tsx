@@ -63,7 +63,7 @@ const Admin: React.FC = () => {
       setUsername('');
       setPassword('');
     } else {
-      setLoginError('Invalid credentials. Use Username: Prof, Password: prof');
+      setLoginError('Invalid credentials. Toka Hapa 😂');
     }
   };
 
