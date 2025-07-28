@@ -202,11 +202,6 @@ const Admin: React.FC = () => {
             >
               Login
             </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              <p>Demo credentials:</p>
-              <p>Username: <strong>Prof</strong></p>
-              <p>Password: <strong>prof</strong></p>
-            </div>
           </CardContent>
         </Card>
       </div>
