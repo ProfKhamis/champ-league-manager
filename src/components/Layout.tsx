@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               />
               <div>
                 <h1 className="text-2xl font-bold text-primary-foreground">
-                 Efootball UEFA Champions League
+                 E-UEFA Champions League
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Professional League Manager
