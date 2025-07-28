@@ -64,7 +64,7 @@ const Groups: React.FC = () => {
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Group Standings</h1>
         <p className="text-muted-foreground">
-          Current standings for all 8 Champions League groups
+          Current standings for all 6 Champions League groups
         </p>
       </div>
 

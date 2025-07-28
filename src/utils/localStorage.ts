@@ -31,8 +31,6 @@ export const getDefaultCompetitionState = (): CompetitionState => {
       { name: 'D', teams: [], standings: [] },
       { name: 'E', teams: [], standings: [] },
       { name: 'F', teams: [], standings: [] },
-      { name: 'G', teams: [], standings: [] },
-      { name: 'H', teams: [], standings: [] },
     ],
     matches: [],
     knockoutPairings: [],

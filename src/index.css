@@ -341,4 +341,86 @@
     font-size: 14px;
     letter-spacing: 0.025em;
   }
+
+  /* Score Input Styles */
+  .score-input-card {
+    @apply border-2 border-primary/20 bg-gradient-to-br from-card to-secondary/20;
+  }
+
+  .score-select .select-trigger {
+    @apply h-12 border-2 border-input hover:border-primary/50 transition-colors;
+  }
+
+  .score-input {
+    @apply h-16 border-2 border-input hover:border-primary/50 focus:border-primary transition-colors;
+  }
+
+  .match-preview {
+    @apply animate-in fade-in-50 duration-300;
+  }
+
+  /* Fixtures Table Styles */
+  .fixtures-table-container {
+    @apply overflow-x-auto rounded-lg border border-border;
+  }
+
+  .fixtures-table {
+    @apply w-full border-collapse bg-card;
+  }
+
+  .fixtures-table-header {
+    @apply bg-secondary/50 border-b border-border;
+  }
+
+  .fixtures-th {
+    @apply p-4 text-left font-semibold text-foreground border-r border-border last:border-r-0;
+  }
+
+  .fixtures-table-row {
+    @apply border-b border-border hover:bg-secondary/30 transition-colors;
+  }
+
+  .fixtures-td {
+    @apply p-4 border-r border-border last:border-r-0;
+  }
+
+  .team-cell {
+    @apply flex flex-col gap-1;
+  }
+
+  .team-name {
+    @apply font-semibold text-foreground;
+  }
+
+  .team-venue {
+    @apply flex items-center gap-1 text-xs text-muted-foreground;
+  }
+
+  .score-cell {
+    @apply text-center;
+  }
+
+  .score-display {
+    @apply flex items-center justify-center gap-2 font-bold text-lg;
+  }
+
+  .score-number {
+    @apply bg-primary text-primary-foreground px-3 py-1 rounded-md min-w-[3rem] text-center;
+  }
+
+  .score-separator {
+    @apply text-muted-foreground text-xl;
+  }
+
+  .match-time {
+    @apply flex items-center justify-center gap-2 text-muted-foreground;
+  }
+
+  .status-completed {
+    @apply bg-green-600 text-white hover:bg-green-700;
+  }
+
+  .status-upcoming {
+    @apply border-orange-500 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950;
+  }
 }

@@ -31,6 +31,8 @@ import {
 } from '@/utils/localStorage';
 import { generateGroupFixtures } from '@/utils/championsLogic';
 import { Team, Match } from '@/types/champions';
+import ScoreInput from '@/components/ScoreInput';
+import FixturesTable from '@/components/FixturesTable';
 
 const Admin: React.FC = () => {
   const { state, dispatch } = useChampions();
@@ -72,6 +74,15 @@ const Admin: React.FC = () => {
 
   const handleAddTeam = () => {
     if (!newTeamName.trim()) return;
+
+    // Check for duplicate team name
+    const existingTeam = state.teams.find(t => 
+      t.name.toLowerCase() === newTeamName.trim().toLowerCase()
+    );
+    if (existingTeam) {
+      alert('A team with this name already exists!');
+      return;
+    }
 
     const group = state.groups.find(g => g.name === selectedGroup);
     if (!group || group.teams.length >= 4) {
@@ -245,7 +256,7 @@ const Admin: React.FC = () => {
                 onChange={(e) => setSelectedGroup(e.target.value)}
                 className="w-full h-10 px-3 rounded-md border border-input bg-background"
               >
-                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(group => (
+                {['A', 'B', 'C', 'D', 'E', 'F'].map(group => (
                   <option key={group} value={group}>Group {group}</option>
                 ))}
               </select>
@@ -259,8 +270,8 @@ const Admin: React.FC = () => {
           </div>
 
           {/* Teams List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(groupName => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {['A', 'B', 'C', 'D', 'E', 'F'].map(groupName => {
               const group = state.groups.find(g => g.name === groupName);
               const teams = group?.teams || [];
               
@@ -323,82 +334,19 @@ const Admin: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Match Results */}
+      {/* Score Input */}
+      <ScoreInput />
+
+      {/* Fixtures Table */}
       <Card className="champions-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="w-5 h-5" />
-            Match Results Entry
+            <Calendar className="w-5 h-5" />
+            All Fixtures
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {state.matches.filter(m => !m.completed).slice(0, 10).map(match => (
-              <div 
-                key={match.id}
-                className="flex items-center justify-between p-4 bg-secondary rounded-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <Badge>{match.stage === 'group' ? `Group ${match.group}` : match.stage}</Badge>
-                  <span className="font-medium">
-                    {getTeamName(match.homeTeam)} vs {getTeamName(match.awayTeam)}
-                  </span>
-                </div>
-                
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setEditingMatch(match)}
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Enter Result
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Enter Match Result</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="text-center">
-                        <p className="font-semibold">
-                          {getTeamName(match.homeTeam)} vs {getTeamName(match.awayTeam)}
-                        </p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label>Home Score</Label>
-                          <Input
-                            type="number"
-                            value={homeScore}
-                            onChange={(e) => setHomeScore(e.target.value)}
-                            placeholder="0"
-                          />
-                        </div>
-                        <div>
-                          <Label>Away Score</Label>
-                          <Input
-                            type="number"
-                            value={awayScore}
-                            onChange={(e) => setAwayScore(e.target.value)}
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-                      <Button 
-                        onClick={handleUpdateMatchResult}
-                        className="w-full champions-button"
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        Save Result
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            ))}
-          </div>
+          <FixturesTable />
         </CardContent>
       </Card>
     </div>
