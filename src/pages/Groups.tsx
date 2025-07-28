@@ -2,7 +2,7 @@ import React from 'react';
 import { useChampions } from '@/contexts/ChampionsContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, ArrowUp, ArrowDown } from 'lucide-react';
+import { Trophy, Star, Award } from 'lucide-react';
 
 const Groups: React.FC = () => {
   const { state } = useChampions();
@@ -25,11 +25,26 @@ const Groups: React.FC = () => {
 
   const getQualificationBadge = (position: number) => {
     if (position === 1) {
-      return <Badge className="bg-green-600 text-white">CL Winner</Badge>;
+      return (
+        <Badge className="uefa-qualified-1 flex items-center gap-1">
+          <Trophy className="w-3 h-3" />
+          CL Winner
+        </Badge>
+      );
     } else if (position === 2) {
-      return <Badge className="bg-green-500 text-white">CL Qualifier</Badge>;
+      return (
+        <Badge className="uefa-qualified-2 flex items-center gap-1">
+          <Star className="w-3 h-3" />
+          Qualified
+        </Badge>
+      );
     } else if (position === 3) {
-      return <Badge className="bg-orange-500 text-white">Europa League</Badge>;
+      return (
+        <Badge className="uefa-europa flex items-center gap-1">
+          <Award className="w-3 h-3" />
+          Europa
+        </Badge>
+      );
     } else {
       return <Badge variant="destructive">Eliminated</Badge>;
     }
@@ -64,73 +79,57 @@ const Groups: React.FC = () => {
             </CardHeader>
             <CardContent>
               {group.standings.length > 0 ? (
-                <div className="overflow-hidden rounded-lg border border-border">
-                  <table className="w-full">
+                <div className="uefa-table-container">
+                  <table className="uefa-table">
                     <thead>
-                      <tr className="table-header">
-                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                          Pos
-                        </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">
-                          Team
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          P
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          W
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          D
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          L
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          GF
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          GA
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          GD
-                        </th>
-                        <th className="px-1 py-2 text-center text-xs font-medium uppercase tracking-wider">
-                          Pts
-                        </th>
+                      <tr className="uefa-table-header">
+                        <th className="uefa-th uefa-th-pos">#</th>
+                        <th className="uefa-th uefa-th-team">Team</th>
+                        <th className="uefa-th uefa-th-stat">P</th>
+                        <th className="uefa-th uefa-th-stat">W</th>
+                        <th className="uefa-th uefa-th-stat">D</th>
+                        <th className="uefa-th uefa-th-stat">L</th>
+                        <th className="uefa-th uefa-th-stat">GF</th>
+                        <th className="uefa-th uefa-th-stat">GA</th>
+                        <th className="uefa-th uefa-th-stat">GD</th>
+                        <th className="uefa-th uefa-th-stat">Pts</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-card">
+                    <tbody>
                       {group.standings.map((standing, index) => (
                         <tr 
                           key={standing.teamId} 
-                          className={`table-row border-t border-border ${getQualificationClass(standing.position)}`}
+                          className={`uefa-table-row ${getQualificationClass(standing.position)}`}
                         >
-                          <td className="px-3 py-3 text-sm font-medium">
-                            {standing.position}
-                          </td>
-                          <td className="px-3 py-3 text-sm font-medium">
-                            <div className="flex items-center justify-between">
-                              <span className="text-primary-foreground">
-                                {standing.teamName}
-                              </span>
-                              {getQualificationBadge(standing.position)}
+                          <td className="uefa-td uefa-td-pos">
+                            <div className="uefa-position">
+                              {standing.position}
                             </div>
                           </td>
-                          <td className="px-1 py-3 text-center text-sm">{standing.played}</td>
-                          <td className="px-1 py-3 text-center text-sm">{standing.won}</td>
-                          <td className="px-1 py-3 text-center text-sm">{standing.drawn}</td>
-                          <td className="px-1 py-3 text-center text-sm">{standing.lost}</td>
-                          <td className="px-1 py-3 text-center text-sm">{standing.goalsFor}</td>
-                          <td className="px-1 py-3 text-center text-sm">{standing.goalsAgainst}</td>
-                          <td className={`px-1 py-3 text-center text-sm font-medium ${
-                            standing.goalDifference > 0 ? 'text-green-400' : 
-                            standing.goalDifference < 0 ? 'text-red-400' : 'text-muted-foreground'
-                          }`}>
-                            {standing.goalDifference > 0 ? '+' : ''}{standing.goalDifference}
+                          <td className="uefa-td uefa-td-team">
+                            <div className="uefa-team-cell">
+                              <span className="uefa-team-name">
+                                {standing.teamName}
+                              </span>
+                              <div className="uefa-badge-wrapper">
+                                {getQualificationBadge(standing.position)}
+                              </div>
+                            </div>
                           </td>
-                          <td className="px-1 py-3 text-center text-sm font-bold text-primary">
-                            {standing.points}
+                          <td className="uefa-td uefa-td-stat">{standing.played}</td>
+                          <td className="uefa-td uefa-td-stat">{standing.won}</td>
+                          <td className="uefa-td uefa-td-stat">{standing.drawn}</td>
+                          <td className="uefa-td uefa-td-stat">{standing.lost}</td>
+                          <td className="uefa-td uefa-td-stat">{standing.goalsFor}</td>
+                          <td className="uefa-td uefa-td-stat">{standing.goalsAgainst}</td>
+                          <td className="uefa-td uefa-td-stat uefa-gd">
+                            <span className={standing.goalDifference > 0 ? 'uefa-gd-positive' : 
+                              standing.goalDifference < 0 ? 'uefa-gd-negative' : 'uefa-gd-neutral'}>
+                              {standing.goalDifference > 0 ? '+' : ''}{standing.goalDifference}
+                            </span>
+                          </td>
+                          <td className="uefa-td uefa-td-stat uefa-points">
+                            <strong>{standing.points}</strong>
                           </td>
                         </tr>
                       ))}
@@ -174,6 +173,15 @@ const Groups: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Footer */}
+      <footer className="uefa-footer">
+        <div className="uefa-footer-content">
+          <p className="uefa-footer-text">
+            Made with 🥶 profKhamis
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
