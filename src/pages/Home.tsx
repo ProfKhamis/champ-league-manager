@@ -65,7 +65,7 @@ const Home: React.FC = () => {
           className="w-20 h-20 mx-auto mb-6 object-contain"
         />
         <h1 className="text-4xl md:text-6xl font-bold text-primary-foreground mb-4">
-          UEFA Champions League
+          Efootball UEFA League
         </h1>
         <p className="text-xl text-muted-foreground mb-6">
           Professional League Management System
