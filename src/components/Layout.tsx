@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               />
               <div>
                 <h1 className="text-2xl font-bold text-primary-foreground">
-                  UEFA Champions League
+                 Efootball UEFA Champions League
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Professional League Manager
@@ -114,10 +114,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <p className="text-muted-foreground">
-              © 2024 UEFA Champions League Manager - Professional Web Application
+              © 2025 Efootball UEFA Champions League Manager - Efootball Uefa style Made Easy
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Built with React, TypeScript & Tailwind CSS
+             Made with 🌀ProfKhamis - Kirinyaga University
             </p>
           </div>
         </div>
