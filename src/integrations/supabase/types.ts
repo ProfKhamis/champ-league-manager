@@ -14,7 +14,135 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      groups: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          is_completed: boolean
+          matchday: number
+          team_a_id: string
+          team_a_score: number | null
+          team_b_id: string
+          team_b_score: number | null
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          is_completed?: boolean
+          matchday?: number
+          team_a_id: string
+          team_a_score?: number | null
+          team_b_id: string
+          team_b_score?: number | null
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          is_completed?: boolean
+          matchday?: number
+          team_a_id?: string
+          team_a_score?: number | null
+          team_b_id?: string
+          team_b_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_team_a_id_fkey"
+            columns: ["team_a_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_team_b_id_fkey"
+            columns: ["team_b_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          drawn: number
+          goal_difference: number
+          goals_against: number
+          goals_for: number
+          group_id: string
+          id: string
+          lost: number
+          name: string
+          played: number
+          points: number
+          won: number
+        }
+        Insert: {
+          created_at?: string
+          drawn?: number
+          goal_difference?: number
+          goals_against?: number
+          goals_for?: number
+          group_id: string
+          id?: string
+          lost?: number
+          name: string
+          played?: number
+          points?: number
+          won?: number
+        }
+        Update: {
+          created_at?: string
+          drawn?: number
+          goal_difference?: number
+          goals_against?: number
+          goals_for?: number
+          group_id?: string
+          id?: string
+          lost?: number
+          name?: string
+          played?: number
+          points?: number
+          won?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -234,7 +234,7 @@ const Home: React.FC = () => {
             <p className="text-muted-foreground mb-4">
               No teams have been added to the tournament yet. Use the Admin Panel to set up teams and groups.
             </p>
-            <Link to="/admin">
+            <Link to="/auth">
               <Button variant="admin">
                 Go to Admin Panel
               </Button>

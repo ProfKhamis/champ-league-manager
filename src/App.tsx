@@ -11,6 +11,7 @@ import Fixtures from "./pages/Fixtures";
 import MatchHistory from "./pages/MatchHistory";
 import Knockout from "./pages/Knockout";
 import Admin from "./pages/Admin";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/knockout" element={<Knockout />} />
               <Route path="/history" element={<MatchHistory />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/auth" element={<Auth />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
