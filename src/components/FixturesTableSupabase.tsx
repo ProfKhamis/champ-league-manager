@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Trophy, Clock, Share } from 'lucide-react';
+import { Calendar, Trophy, Clock, Share, Download, Image } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 const FixturesTableSupabase: React.FC = () => {
   const { toast } = useToast();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedMatchday, setSelectedMatchday] = useState<string>("all");
+  const [selectedGroup, setSelectedGroup] = useState<string>("all");
+  const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadMatches();
@@ -40,27 +45,68 @@ const FixturesTableSupabase: React.FC = () => {
     }
   };
 
-  const shareToWhatsApp = (match) => {
-    const message = `🏆 Champions League Match
-${match.team_a?.name} vs ${match.team_b?.name}
-${match.group?.name} - Matchday ${match.matchday}
-${match.is_completed ? 
-  `Score: ${match.team_a_score || 0} - ${match.team_b_score || 0}` : 
-  'Fixture scheduled'
-}`;
+  const generatePNGAndShare = async () => {
+    if (!tableRef.current) return;
     
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    try {
+      const canvas = await html2canvas(tableRef.current, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        width: tableRef.current.scrollWidth,
+        height: tableRef.current.scrollHeight,
+      });
+      
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${getTableTitle()}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+          
+          // Also prepare for WhatsApp
+          const message = `🏆 Champions League Fixtures - ${getTableTitle()}`;
+          const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+          
+          toast({
+            title: "Fixtures downloaded!",
+            description: "PNG saved. Opening WhatsApp to share...",
+          });
+          
+          setTimeout(() => {
+            window.open(whatsappUrl, '_blank');
+          }, 1000);
+        }
+      }, 'image/png');
+    } catch (error) {
+      toast({
+        title: "Error generating image",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
-  const groupedMatches = matches.reduce((acc, match) => {
-    const groupName = match.group?.name || 'Unknown Group';
-    if (!acc[groupName]) {
-      acc[groupName] = [];
+  const getTableTitle = () => {
+    if (selectedMatchday !== "all" && selectedGroup !== "all") {
+      return `${selectedGroup} - Matchday ${selectedMatchday} Fixtures`;
+    } else if (selectedMatchday !== "all") {
+      return `Matchday ${selectedMatchday} Fixtures`;
+    } else if (selectedGroup !== "all") {
+      return `${selectedGroup} Fixtures`;
     }
-    acc[groupName].push(match);
-    return acc;
-  }, {});
+    return "Tournament Fixtures";
+  };
+
+  const filteredMatches = matches.filter(match => {
+    const matchdayFilter = selectedMatchday === "all" || match.matchday.toString() === selectedMatchday;
+    const groupFilter = selectedGroup === "all" || match.group?.name === selectedGroup;
+    return matchdayFilter && groupFilter;
+  });
+
+  const uniqueMatchdays = [...new Set(matches.map(m => m.matchday))].sort((a, b) => a - b);
+  const uniqueGroups = [...new Set(matches.map(m => m.group?.name).filter(Boolean))].sort();
 
   if (loading) {
     return (
@@ -82,95 +128,107 @@ ${match.is_completed ?
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {Object.keys(groupedMatches).length === 0 ? (
+        {matches.length === 0 ? (
           <div className="text-center py-8">
             <Trophy className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-muted-foreground">No fixtures generated yet</p>
           </div>
         ) : (
-          <div className="space-y-8">
-            {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
-              <div key={groupName} className="space-y-4">
-                <h3 className="text-xl font-bold text-primary border-b border-primary/20 pb-2">
-                  {groupName}
-                </h3>
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Matchday</label>
+                  <Select value={selectedMatchday} onValueChange={setSelectedMatchday}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      {uniqueMatchdays.map(md => (
+                        <SelectItem key={md} value={md.toString()}>MD {md}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Group</label>
+                  <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Groups</SelectItem>
+                      {uniqueGroups.map(group => (
+                        <SelectItem key={group} value={group}>{group}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <Button 
+                onClick={generatePNGAndShare} 
+                variant="champions"
+                className="gap-2"
+                disabled={filteredMatches.length === 0}
+              >
+                <Image className="w-4 h-4" />
+                Share PNG
+              </Button>
+            </div>
+
+            {/* Fixtures Table */}
+            {filteredMatches.length === 0 ? (
+              <div className="text-center py-8">
+                <Trophy className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No fixtures match the selected filters</p>
+              </div>
+            ) : (
+              <div ref={tableRef} className="bg-white p-6 rounded-lg border">
+                <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">
+                  {getTableTitle()}
+                </h2>
                 
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left p-3 font-semibold">Match</th>
-                        <th className="text-center p-3 font-semibold">Matchday</th>
-                        <th className="text-center p-3 font-semibold">Result</th>
-                        <th className="text-center p-3 font-semibold">Status</th>
-                        <th className="text-center p-3 font-semibold">Share</th>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-900">
+                          Home
+                        </th>
+                        <th className="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-900">
+                          Away
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(groupMatches as any[]).map((match) => (
-                        <tr key={match.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
-                          <td className="p-3">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{match.team_a?.name}</span>
-                              <span className="text-muted-foreground">vs</span>
-                              <span className="font-medium">{match.team_b?.name}</span>
-                            </div>
+                      {filteredMatches.map((match, index) => (
+                        <tr key={match.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                          <td className="border border-gray-300 px-4 py-3 text-center text-gray-900 font-medium">
+                            {match.team_a?.name}
                           </td>
-                          <td className="text-center p-3">
-                            <Badge variant="outline" className="font-mono">
-                              MD{match.matchday}
-                            </Badge>
-                          </td>
-                          <td className="text-center p-3">
-                            {match.is_completed ? (
-                              <div className="flex items-center justify-center gap-2">
-                                <span className="font-bold text-lg">
-                                  {match.team_a_score || 0}
-                                </span>
-                                <span className="text-muted-foreground">-</span>
-                                <span className="font-bold text-lg">
-                                  {match.team_b_score || 0}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground">TBD</span>
-                            )}
-                          </td>
-                          <td className="text-center p-3">
-                            <Badge 
-                              variant={match.is_completed ? "default" : "secondary"}
-                              className="gap-1"
-                            >
-                              {match.is_completed ? (
-                                <>
-                                  <Trophy className="w-3 h-3" />
-                                  Completed
-                                </>
-                              ) : (
-                                <>
-                                  <Clock className="w-3 h-3" />
-                                  Scheduled
-                                </>
-                              )}
-                            </Badge>
-                          </td>
-                          <td className="text-center p-3">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => shareToWhatsApp(match)}
-                              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                            >
-                              <Share className="w-4 h-4" />
-                            </Button>
+                          <td className="border border-gray-300 px-4 py-3 text-center text-gray-900 font-medium">
+                            {match.team_b?.name}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+                
+                {/* Group and Matchday info */}
+                {selectedGroup !== "all" || selectedMatchday !== "all" ? (
+                  <div className="mt-4 text-center text-sm text-gray-600">
+                    {selectedGroup !== "all" && <span>{selectedGroup}</span>}
+                    {selectedGroup !== "all" && selectedMatchday !== "all" && <span> • </span>}
+                    {selectedMatchday !== "all" && <span>Matchday {selectedMatchday}</span>}
+                  </div>
+                ) : null}
               </div>
-            ))}
+            )}
           </div>
         )}
       </CardContent>
